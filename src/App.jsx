@@ -14,13 +14,11 @@ function App() {
   const [inputValue, setInputValue] = useState("");
 
   const handleDeleteContact = id => {
-    console.log(id);
     setContacts(contacts => contacts.filter(contact => contact.id !== id));
   };
 
   const handleChangeInput = e => {
     setInputValue(e.target.value);
-    console.log(e.target.value);
   };
 
   const filteredContacts = contacts.filter(contact =>

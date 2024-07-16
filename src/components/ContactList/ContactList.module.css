@@ -2,9 +2,11 @@
   margin-top: 20px;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .list {
+  padding: 30px;
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
