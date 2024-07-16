@@ -1,65 +1,54 @@
 import { useEffect, useState } from "react";
-import Description from "./components/Description/Description";
-import Options from "./components/Options/Options";
-import Feedback from "./components/Feedback/Feedback";
-import Notification from "./components/Notification/Notification";
+import ContactForm from "./components/ContactForm/ContactForm";
+import ContactList from "./components/ContactList/ContactList";
+import contactsData from "./contacts.json";
+import SearchBox from "./components/SearchBox/SearchBox";
 
 function App() {
-  const initialFeedback = () => {
-    const savedFeedback = window.localStorage.getItem("savedFeedback");
-
-    if (savedFeedback?.length) {
-      return JSON.parse(savedFeedback);
-    }
-    return {
-      good: 0,
-      neutral: 0,
-      bad: 0,
-    };
+  const getInitialContacts = () => {
+    const savedContacts = window.localStorage.getItem("savedContacts");
+    return savedContacts?.length ? JSON.parse(savedContacts) : contactsData;
   };
 
-  const [FeedbackType, setFeedbackType] = useState(initialFeedback);
+  const [contacts, setContacts] = useState(getInitialContacts);
+  const [inputValue, setInputValue] = useState("");
+
+  const handleDeleteContact = id => {
+    console.log(id);
+    setContacts(contacts => contacts.filter(contact => contact.id !== id));
+  };
+
+  const handleChangeInput = e => {
+    setInputValue(e.target.value);
+    console.log(e.target.value);
+  };
+
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(inputValue.toLowerCase())
+  );
+
+  const handleAddContact = newContact => {
+    setContacts(prev => [...prev, newContact]);
+  };
 
   useEffect(() => {
-    window.localStorage.setItem("savedFeedback", JSON.stringify(FeedbackType));
-  }, [FeedbackType]);
-
-  const updateFeedback = FeedbackType => {
-    setFeedbackType(prevFeedback => ({
-      ...prevFeedback,
-      [FeedbackType]: prevFeedback[FeedbackType] + 1,
-    }));
-  };
-
-  const totalFeedback =
-    FeedbackType.good + FeedbackType.neutral + FeedbackType.bad;
-
-  const positiveFeedback =
-    totalFeedback > 0
-      ? Math.round((FeedbackType.good / totalFeedback) * 100)
-      : 0;
-
-  const resetFeedback = () => {
-    setFeedbackType({ good: 0, bad: 0, neutral: 0 });
-  };
+    window.localStorage.setItem("savedContacts", JSON.stringify(contacts));
+  }, [contacts]);
 
   return (
     <>
-      <Description />
-      <Options
-        updateFeedback={updateFeedback}
-        totalFeedback={totalFeedback}
-        resetFeedback={resetFeedback}
-      />
-      {totalFeedback > 0 ? (
-        <Feedback
-          FeedbackType={FeedbackType}
-          positiveFeedback={positiveFeedback}
-          totalFeedback={totalFeedback}
+      <div>
+        <h1 style={{ textAlign: "center", color: "teal" }}>Phonebook</h1>
+        <ContactForm onAdd={handleAddContact} />
+        <SearchBox
+          handleChangeInput={handleChangeInput}
+          inputValue={inputValue}
         />
-      ) : (
-        <Notification />
-      )}
+        <ContactList
+          contacts={filteredContacts}
+          handleDeleteContact={handleDeleteContact}
+        />
+      </div>
     </>
   );
 }
